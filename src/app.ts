@@ -1,7 +1,9 @@
+import "dotenv/config";
 import express, { NextFunction } from "express";
 import { Request, Response } from "express";
 import sequelize from "./models";
 import userRoutes from "@routes/userRoutes";
+import authRoutes from "@routes/authRoutes";
 import bodyParser from "body-parser";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "@config/swagger";
@@ -21,6 +23,7 @@ app.use(
   })
 );
 
+app.use("/auth", authRoutes);
 app.use("/usuarios", userRoutes);
 
 app.get("/", async (req: any, res: any) => {

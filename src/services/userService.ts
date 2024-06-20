@@ -1,4 +1,5 @@
 import User from "@/models/user";
+import { hashPassword } from "./authService";
 
 export const createUser = async (
   firstName: string,
@@ -7,7 +8,13 @@ export const createUser = async (
   password: string
 ) => {
   try {
-    return await User.create({ firstName, lastName, email, password });
+    const hashedPassword = await hashPassword(password);
+    return await User.create({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+    });
   } catch (error: any) {
     throw new Error(`Unable to create user: ${error.message}`);
   }
