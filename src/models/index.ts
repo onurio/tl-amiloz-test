@@ -1,11 +1,13 @@
 "use strict";
 import path from "path";
-import { Sequelize, DataTypes } from "sequelize";
-const basename = path.basename(__filename);
+import { Sequelize } from "sequelize-typescript";
 const env = process.env.NODE_ENV || "development";
 const config = require(__dirname + "/../config/config.json")[env];
 
-const sequelize = new Sequelize(config);
+const sequelize = new Sequelize({
+  ...config,
+  models: [__dirname + "src/models"],
+});
 
 sequelize
   .authenticate()
