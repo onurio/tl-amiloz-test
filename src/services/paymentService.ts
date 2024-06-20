@@ -74,15 +74,15 @@ export const revertPayment = async (paymentId: number) => {
     throw new Error("Loan not found");
   }
 
+  if (payment.amountPaid === 0) {
+    throw new Error("No funds to revert payment");
+  }
+
   payment.amountPaid = 0;
   await payment.save();
 
   loan.isPaid = false;
   await loan.save();
 
-  const updatedLoan = await Loan.findByPk(loan.id, {
-    include: { model: Payment, as: "payments" },
-  });
-
-  return updatedLoan;
+  return payment;
 };

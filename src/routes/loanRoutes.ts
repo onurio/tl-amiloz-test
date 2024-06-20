@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { applyPayment } from "@controllers/paymentController";
 import { verifyToken } from "@middlewares/authMiddleware";
+import { checkLoanOwnership } from "@/middlewares/ownershipMiddleware";
 
 const router = Router();
 
@@ -44,6 +45,6 @@ const router = Router();
  *       404:
  *         description: Loan not found
  */
-router.post("/:loanId/pagos", verifyToken, applyPayment);
+router.post("/:loanId/pagos", verifyToken, checkLoanOwnership, applyPayment);
 
 export default router;

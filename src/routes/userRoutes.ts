@@ -2,6 +2,7 @@ import { createLoan } from "@/controllers/loanController";
 import { createUserOffers } from "@/controllers/offerController";
 import { createUser } from "@/controllers/userController";
 import { verifyToken } from "@/middlewares/authMiddleware";
+import { checkOfferOwnership } from "@/middlewares/ownershipMiddleware";
 import { Router } from "express";
 
 const router = Router();
@@ -68,7 +69,7 @@ router.post("/", createUser);
  *       404:
  *         description: User not found
  */
-router.post("/:userId/ofertas", verifyToken, createUserOffers); // Add the route for offers
+router.post("/:userId/ofertas", verifyToken, createUserOffers);
 
 /**
  * @swagger
@@ -107,6 +108,6 @@ router.post("/:userId/ofertas", verifyToken, createUserOffers); // Add the route
  *       404:
  *         description: User or Offer not found
  */
-router.post("/:userId/prestamos", createLoan);
+router.post("/:userId/prestamos", verifyToken, checkOfferOwnership, createLoan);
 
 export default router;

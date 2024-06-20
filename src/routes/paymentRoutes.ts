@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { revertPayment } from "@controllers/paymentController";
 import { verifyToken } from "@middlewares/authMiddleware";
+import { checkPaymentOwnership } from "@/middlewares/ownershipMiddleware";
 
 const router = Router();
 
@@ -32,6 +33,11 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
-router.post("/:paymentId/revertir", verifyToken, revertPayment);
+router.post(
+  "/:paymentId/revertir",
+  verifyToken,
+  checkPaymentOwnership,
+  revertPayment
+);
 
 export default router;

@@ -268,7 +268,7 @@ const swaggerDefinition: OpenAPIV3.Document = {
                 schema: {
                   type: "object",
                   properties: {
-                    loan: { $ref: "#/components/schemas/Loan" },
+                    loan: { $ref: "#/components/schemas/Payment" },
                   },
                 },
               },

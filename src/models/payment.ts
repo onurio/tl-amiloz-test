@@ -24,6 +24,7 @@ class Payment
   public dueDate!: Date;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+  public readonly loan?: any;
 }
 
 Payment.init(
