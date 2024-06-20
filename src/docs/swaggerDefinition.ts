@@ -152,6 +152,55 @@ const swaggerDefinition: OpenAPIV3.Document = {
         },
       },
     },
+    "/usuarios/{userId}/prestamos": {
+      post: {
+        summary: "Create a loan based on a selected offer",
+        tags: ["User"],
+        parameters: [
+          {
+            in: "path",
+            name: "userId",
+            required: true,
+            schema: { type: "integer" },
+            description: "ID of the user",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["offerId"],
+                properties: {
+                  offerId: {
+                    type: "integer",
+                    description: "ID of the selected offer",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Loan created",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    loan: { $ref: "#/components/schemas/Loan" },
+                  },
+                },
+              },
+            },
+          },
+          400: { description: "Invalid input" },
+          404: { description: "User or Offer not found" },
+        },
+      },
+    },
   },
   components: {
     schemas: {
@@ -223,6 +272,58 @@ const swaggerDefinition: OpenAPIV3.Document = {
             format: "date-time",
             readOnly: true,
             description: "The date the offer was last updated",
+          },
+        },
+      },
+      Loan: {
+        type: "object",
+        required: [
+          "userId",
+          "offerId",
+          "amount",
+          "term",
+          "interestRate",
+          "paymentSchedule",
+        ],
+        properties: {
+          id: {
+            type: "integer",
+            readOnly: true,
+            description: "The auto-generated id of the loan",
+          },
+          userId: { type: "integer", description: "The id of the user" },
+          offerId: { type: "integer", description: "The id of the offer" },
+          amount: { type: "number", description: "The amount of the loan" },
+          term: {
+            type: "integer",
+            description: "The term of the loan in weeks",
+          },
+          interestRate: {
+            type: "number",
+            description: "The interest rate of the loan in percentage",
+          },
+          paymentSchedule: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                week: { type: "integer" },
+                amount: { type: "number" },
+                dueDate: { type: "string", format: "date-time" },
+              },
+            },
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            readOnly: true,
+            description: "The date the loan was added",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            readOnly: true,
+            description: "The date the loan was last updated",
           },
         },
       },

@@ -6,7 +6,7 @@ interface OfferAttributes {
   id: number;
   userId: number;
   amount: number;
-  term: number; // in months
+  term: number; // in weeks
   interestRate: number; // in percentage
   createdAt?: Date;
   updatedAt?: Date;
