@@ -8,6 +8,7 @@ import bodyParser from "body-parser";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "@config/swagger";
 import { middleware as OpenApiValidator } from "express-openapi-validator";
+import { OpenApiValidatorOpts } from "express-openapi-validator/dist/framework/types";
 
 const app = express();
 const port = 3000;
@@ -15,13 +16,12 @@ const port = 3000;
 app.use(bodyParser.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use(
-  OpenApiValidator({
-    apiSpec: swaggerSpec as any,
-    validateRequests: true,
-    validateResponses: true,
-  })
-);
+const validatorOptions: OpenApiValidatorOpts = {
+  apiSpec: swaggerSpec as any,
+  validateRequests: true,
+};
+
+app.use(OpenApiValidator(validatorOptions));
 
 app.use("/auth", authRoutes);
 app.use("/usuarios", userRoutes);

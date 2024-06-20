@@ -1,9 +1,9 @@
 import swaggerJsdoc from "swagger-jsdoc";
-import swaggerDefinition from "../docs/swaggerDefinition";
+import swaggerDefinition from "@/docs/swaggerDefinition";
 
 const options = {
   swaggerDefinition,
-  apis: ["./src/routes/*.ts"],
+  apis: ["./src/**/*.ts", "./src/**/*.js"],
 };
 
 const swaggerSpec = swaggerJsdoc(options);

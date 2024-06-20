@@ -16,7 +16,8 @@
       "@models/*": ["models/*"],
       "@services/*": ["services/*"],
       "@routes/*": ["routes/*"],
-      "@utils/*": ["utils/*"]
+      "@utils/*": ["utils/*"],
+      "@middlewares/*": ["middlewares/*"]
     }
   },
   "include": ["src/**/*"],

@@ -6,7 +6,7 @@ const router = Router();
 
 /**
  * @swagger
- * /login:
+ * /auth/login:
  *   post:
  *     summary: Login a user
  *     tags: [Auth]
@@ -40,7 +40,7 @@ router.post("/login", login);
 
 /**
  * @swagger
- * /check:
+ * /auth/check:
  *   get:
  *     summary: Check if user is authenticated
  *     tags: [Auth]

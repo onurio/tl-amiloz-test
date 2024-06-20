@@ -37,18 +37,55 @@ Offer.init(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: "Users",
+        key: "id",
+      },
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
     amount: {
       type: DataTypes.DECIMAL,
       allowNull: false,
+      validate: {
+        min: {
+          args: [0],
+          msg: "Amount must be greater than or equal to 0",
+        },
+        isDecimal: {
+          msg: "Amount must be a decimal number",
+        },
+      },
     },
     term: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      validate: {
+        min: {
+          args: [1],
+          msg: "Term must be at least 1 month",
+        },
+        isInt: {
+          msg: "Term must be an integer",
+        },
+      },
     },
     interestRate: {
       type: DataTypes.DECIMAL,
       allowNull: false,
+      validate: {
+        min: {
+          args: [0],
+          msg: "Interest rate must be greater than or equal to 0",
+        },
+        max: {
+          args: [100],
+          msg: "Interest rate must be less than or equal to 100",
+        },
+        isDecimal: {
+          msg: "Interest rate must be a decimal number",
+        },
+      },
     },
   },
   {
