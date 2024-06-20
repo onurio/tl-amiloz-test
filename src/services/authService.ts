@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { User } from "@models/user";
+import User from "@models/user";
 
 const authSecret = process.env.AUTH_SECRET;
 const tokenExpiration = process.env.TOKEN_EXPIRATION || "24h";

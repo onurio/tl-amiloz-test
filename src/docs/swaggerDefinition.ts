@@ -1,4 +1,3 @@
-// src/docs/swaggerDefinition.ts
 import { SwaggerDefinition } from "swagger-jsdoc";
 
 const swaggerDefinition: SwaggerDefinition = {
