@@ -1,6 +1,7 @@
 import Loan from "@models/loan";
 import Offer from "@models/offer";
 import Payment from "@models/payment";
+import { createTransactions } from "./transactionService";
 
 export const createLoan = async (userId: number, offerId: number) => {
   const offer = await Offer.findOne({
@@ -24,6 +25,10 @@ export const createLoan = async (userId: number, offerId: number) => {
     interestRate: offer.interestRate,
     isPaid: false,
   });
+
+  await createTransactions([
+    { loanId: loan.id, amount: loan.amount, direction: "outgoing" },
+  ]);
 
   const paymentSchedule = Array.from({ length: offer.term }, (_, i) => {
     const dueDate = new Date();
