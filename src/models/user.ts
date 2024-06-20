@@ -1,30 +1,66 @@
-import { DataTypes } from "sequelize";
-import { Sequelize } from "sequelize-typescript";
+// src/models/user.ts
+import { DataTypes, Model, Optional } from "sequelize";
+import sequelize from ".";
 
 export interface UserAttributes {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  password?: string;
-}
-
-export interface UserInstance {
   id: number;
-  createdAt: Date;
-  updatedAt: Date;
   firstName: string;
   lastName: string;
   email: string;
   password: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-export default function (sequelize: Sequelize) {
-  var User = sequelize.define("User", {
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    email: DataTypes.STRING,
-    password: DataTypes.STRING,
-  });
+export interface UserCreationAttributes
+  extends Optional<UserAttributes, "id"> {}
 
-  return User;
+export class User
+  extends Model<UserAttributes, UserCreationAttributes>
+  implements UserAttributes
+{
+  public id!: number;
+  public firstName!: string;
+  public lastName!: string;
+  public email!: string;
+  public password!: string;
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
+
+User.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true,
+      },
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    modelName: "User",
+    tableName: "Users",
+  }
+);
+
+export default User;

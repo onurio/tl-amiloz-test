@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# This is for development purposes
+npm install
+
 # Compile TypeScript to JavaScript for migrations
 npm run build
 
@@ -7,5 +10,4 @@ npm run build
 npx sequelize-cli-typescript db:migrate
 
 
-# Start the application with nodemon
-nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/app.ts
+npm run dev

@@ -1,5 +1,4 @@
 "use strict";
-import path from "path";
 import { Sequelize } from "sequelize-typescript";
 const env = process.env.NODE_ENV || "development";
 const config = require(__dirname + "/../config/config.json")[env];

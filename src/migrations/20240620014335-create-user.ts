@@ -4,7 +4,7 @@ import { QueryInterface } from "sequelize";
 
 export = {
   up: (queryInterface: QueryInterface, Sequelize: Sequelize) => {
-    return queryInterface.createTable("User", {
+    return queryInterface.createTable("Users", {
       id: {
         allowNull: false,
         autoIncrement: true,
