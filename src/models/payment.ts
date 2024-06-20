@@ -49,6 +49,7 @@ Payment.init(
     },
     amountPaid: {
       type: DataTypes.DECIMAL,
+      allowNull: false,
       defaultValue: 0,
     },
     dueDate: {

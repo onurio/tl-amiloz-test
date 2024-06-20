@@ -247,6 +247,38 @@ const swaggerDefinition: OpenAPIV3.Document = {
         },
       },
     },
+    "/pagos/{paymentId}/revertir": {
+      post: {
+        summary: "Revert a payment",
+        tags: ["Payment"],
+        parameters: [
+          {
+            in: "path",
+            name: "paymentId",
+            required: true,
+            schema: { type: "integer" },
+            description: "ID of the payment",
+          },
+        ],
+        responses: {
+          200: {
+            description: "Payment reverted",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    loan: { $ref: "#/components/schemas/Loan" },
+                  },
+                },
+              },
+            },
+          },
+          404: { description: "Payment or loan not found" },
+          500: { description: "Internal server error" },
+        },
+      },
+    },
   },
   components: {
     schemas: {
