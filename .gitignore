@@ -1,0 +1,30 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+
+# SQLite database files
+*.sqlite
+*.sqlite3
+
+# Optional npm cache directory
+.npm
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+
+# Debugging
+.vscode/
+.idea/
+*.swp
