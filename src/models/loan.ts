@@ -2,15 +2,16 @@ import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from ".";
 import User from "./user";
 import Offer from "./offer";
+import Payment from "./payment";
 
 interface LoanAttributes {
   id: number;
   userId: number;
   offerId: number;
   amount: number;
+  isPaid: boolean;
   term: number; // in weeks
   interestRate: number; // in percentage
-  paymentSchedule: { week: number; amount: number; dueDate: Date }[];
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -25,9 +26,9 @@ class Loan
   public userId!: number;
   public offerId!: number;
   public amount!: number;
+  public isPaid!: boolean;
   public term!: number;
   public interestRate!: number;
-  public paymentSchedule!: { week: number; amount: number; dueDate: Date }[];
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -63,16 +64,17 @@ Loan.init(
       type: DataTypes.DECIMAL,
       allowNull: false,
     },
+    isPaid: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     term: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
     interestRate: {
       type: DataTypes.DECIMAL,
-      allowNull: false,
-    },
-    paymentSchedule: {
-      type: DataTypes.JSON,
       allowNull: false,
     },
   },
@@ -87,5 +89,8 @@ Loan.belongsTo(User, { foreignKey: "userId", as: "user" });
 
 Offer.hasMany(Loan, { foreignKey: "offerId", as: "loans" });
 Loan.belongsTo(Offer, { foreignKey: "offerId", as: "offer" });
+
+Loan.hasMany(Payment, { foreignKey: "loanId", as: "payments" });
+Payment.belongsTo(Loan, { foreignKey: "loanId", as: "loan" });
 
 export default Loan;

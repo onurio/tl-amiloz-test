@@ -26,10 +26,7 @@ const swaggerDefinition: OpenAPIV3.Document = {
                 type: "object",
                 required: ["email", "password"],
                 properties: {
-                  email: {
-                    type: "string",
-                    description: "The user's email address",
-                  },
+                  email: { $ref: "#/components/schemas/Email" },
                   password: {
                     type: "string",
                     description: "The user's password",
@@ -201,9 +198,64 @@ const swaggerDefinition: OpenAPIV3.Document = {
         },
       },
     },
+    "/prestamos/{loanId}/pagos": {
+      post: {
+        summary: "Apply a payment to a loan",
+        tags: ["Payment"],
+        parameters: [
+          {
+            in: "path",
+            name: "loanId",
+            required: true,
+            schema: { type: "integer" },
+            description: "ID of the loan",
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["amount"],
+                properties: {
+                  amount: {
+                    type: "number",
+                    description: "Amount of the payment",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: "Payment applied",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    loan: { $ref: "#/components/schemas/Loan" },
+                  },
+                },
+              },
+            },
+          },
+          400: { description: "Invalid input" },
+          404: { description: "Loan not found" },
+        },
+      },
+    },
   },
   components: {
     schemas: {
+      Email: {
+        type: "string",
+        format: "email",
+        pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        description: "Email address of the user",
+      },
       User: {
         type: "object",
         required: ["firstName", "lastName", "email", "password"],
@@ -221,8 +273,7 @@ const swaggerDefinition: OpenAPIV3.Document = {
             description: "Last name of the user",
           },
           email: {
-            type: "string",
-            description: "Email of the user",
+            $ref: "#/components/schemas/Email",
           },
           password: {
             type: "string",
@@ -255,7 +306,7 @@ const swaggerDefinition: OpenAPIV3.Document = {
           amount: { type: "number", description: "The amount of the offer" },
           term: {
             type: "integer",
-            description: "The term of the offer in months",
+            description: "The term of the offer in weeks",
           },
           interestRate: {
             type: "number",
@@ -277,14 +328,7 @@ const swaggerDefinition: OpenAPIV3.Document = {
       },
       Loan: {
         type: "object",
-        required: [
-          "userId",
-          "offerId",
-          "amount",
-          "term",
-          "interestRate",
-          "paymentSchedule",
-        ],
+        required: ["offerId", "amount", "term", "interestRate"],
         properties: {
           id: {
             type: "integer",
@@ -302,16 +346,9 @@ const swaggerDefinition: OpenAPIV3.Document = {
             type: "number",
             description: "The interest rate of the loan in percentage",
           },
-          paymentSchedule: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                week: { type: "integer" },
-                amount: { type: "number" },
-                dueDate: { type: "string", format: "date-time" },
-              },
-            },
+          isPaid: {
+            type: "boolean",
+            description: "Whether the loan is fully paid",
           },
           createdAt: {
             type: "string",
@@ -324,6 +361,37 @@ const swaggerDefinition: OpenAPIV3.Document = {
             format: "date-time",
             readOnly: true,
             description: "The date the loan was last updated",
+          },
+        },
+      },
+      Payment: {
+        type: "object",
+        required: ["amount", "amountPaid", "dueDate"],
+        properties: {
+          id: {
+            type: "integer",
+            readOnly: true,
+            description: "The auto-generated id of the payment",
+          },
+          loanId: { type: "integer", description: "The id of the loan" },
+          amount: { type: "number", description: "The amount of the payment" },
+          amountPaid: { type: "number", description: "The amount paid so far" },
+          dueDate: {
+            type: "string",
+            format: "date-time",
+            description: "The due date of the payment",
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            readOnly: true,
+            description: "The date the payment was added",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            readOnly: true,
+            description: "The date the payment was last updated",
           },
         },
       },

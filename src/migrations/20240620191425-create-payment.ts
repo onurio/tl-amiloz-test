@@ -2,28 +2,18 @@ import { DataTypes, QueryInterface, Sequelize } from "sequelize";
 
 export = {
   up: (queryInterface: QueryInterface, Sequelize: Sequelize) => {
-    return queryInterface.createTable("Loans", {
+    return queryInterface.createTable("Payments", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      userId: {
+      loanId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "Users",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-      },
-      offerId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: "Offers",
+          model: "Loans",
           key: "id",
         },
         onUpdate: "CASCADE",
@@ -33,17 +23,12 @@ export = {
         type: DataTypes.DECIMAL,
         allowNull: false,
       },
-      isPaid: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      term: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      interestRate: {
+      amountPaid: {
         type: DataTypes.DECIMAL,
+        defaultValue: 0,
+      },
+      dueDate: {
+        type: DataTypes.DATE,
         allowNull: false,
       },
       createdAt: {
@@ -58,6 +43,6 @@ export = {
   },
 
   down: (queryInterface: QueryInterface, Sequelize: Sequelize) => {
-    return queryInterface.dropTable("Loans");
+    return queryInterface.dropTable("Payments");
   },
 };

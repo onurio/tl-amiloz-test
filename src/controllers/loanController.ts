@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Loan from "@models/loan";
 import Offer from "@models/offer";
+import Payment from "@models/payment";
 
 export const createLoan = async (req: Request, res: Response) => {
   const { userId } = req.params;
@@ -18,24 +19,33 @@ export const createLoan = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Offer not found" });
     }
 
+    const totalAmount = offer.amount * (1 + offer.interestRate);
+
     const loan = await Loan.create({
       userId: offer.userId,
       offerId: offer.id,
-      amount: offer.amount,
+      amount: totalAmount,
       term: offer.term,
       interestRate: offer.interestRate,
-      paymentSchedule: Array.from({ length: offer.term * 4 }, (_, i) => {
-        const dueDate = new Date();
-        dueDate.setDate(dueDate.getDate() + 7 * i); // Set the due date for each week
-        return {
-          week: i + 1,
-          amount: offer.amount / (offer.term * 4),
-          dueDate,
-        };
-      }),
+      isPaid: false,
     });
 
-    return res.status(201).json({ loan });
+    const paymentSchedule = Array.from({ length: offer.term }, (_, i) => {
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 7 * i); // Set the due date for each week
+      return {
+        loanId: loan.id,
+        amount: totalAmount / offer.term,
+        amountPaid: 0,
+        dueDate,
+      };
+    });
+
+    await Payment.bulkCreate(paymentSchedule);
+
+    return res
+      .status(201)
+      .json({ loan: { ...loan.toJSON(), payments: paymentSchedule } });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error", error });
   }

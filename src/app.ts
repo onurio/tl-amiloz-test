@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import sequelize from "./models";
 import userRoutes from "@routes/userRoutes";
 import authRoutes from "@routes/authRoutes";
+import loanRoutes from "@routes/loanRoutes";
 import bodyParser from "body-parser";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "@config/swagger";
@@ -25,6 +26,7 @@ app.use(OpenApiValidator(validatorOptions));
 
 app.use("/auth", authRoutes);
 app.use("/usuarios", userRoutes);
+app.use("/prestamos", loanRoutes);
 
 app.get("/", async (req: any, res: any) => {
   let isDbConnected = false;
