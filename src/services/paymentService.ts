@@ -2,6 +2,7 @@ import Loan from "@models/loan";
 import Payment from "@models/payment";
 import { createTransactions } from "./transactionService";
 import { TransactionCreationAttributes } from "@/models/transaction";
+import sequelize from "@/models";
 
 export const applyPayment = async (loanId: number, amount: number) => {
   const loan = await Loan.findByPk(loanId, {
@@ -41,49 +42,58 @@ export const applyPayment = async (loanId: number, amount: number) => {
 };
 
 const _processPayment = async (payments: Payment[], amount: number) => {
-  let remainingAmount = amount;
-  let isPaid = true;
+  const dbTransaction = await sequelize.transaction();
 
-  const transactions: TransactionCreationAttributes[] = [];
+  try {
+    let remainingAmount = amount;
+    let isPaid = true;
 
-  const updatedPayments = payments.map(async (payment) => {
-    const unpaidAmount = payment.amount - payment.amountPaid;
-    if (remainingAmount > 0) {
-      if (unpaidAmount > remainingAmount) {
-        payment.amountPaid += remainingAmount;
-        payment.amountPaid > 0
-          ? transactions.push({
-              paymentId: payment.id,
-              amount: remainingAmount,
-              direction: "incoming",
-              loanId: payment.loanId,
-            })
-          : null;
-        remainingAmount = 0;
-      } else {
-        remainingAmount -= unpaidAmount;
-        payment.amountPaid = payment.amount;
-        unpaidAmount > 0
-          ? transactions.push({
-              paymentId: payment.id,
-              amount: unpaidAmount,
-              direction: "incoming",
-              loanId: payment.loanId,
-            })
-          : null;
+    const transactions: TransactionCreationAttributes[] = [];
+
+    const updatedPayments = payments.map(async (payment) => {
+      const unpaidAmount = payment.amount - payment.amountPaid;
+      if (remainingAmount > 0) {
+        if (unpaidAmount > remainingAmount) {
+          payment.amountPaid += remainingAmount;
+          payment.amountPaid > 0
+            ? transactions.push({
+                paymentId: payment.id,
+                amount: remainingAmount,
+                direction: "incoming",
+                loanId: payment.loanId,
+              })
+            : null;
+          remainingAmount = 0;
+        } else {
+          remainingAmount -= unpaidAmount;
+          payment.amountPaid = payment.amount;
+          unpaidAmount > 0
+            ? transactions.push({
+                paymentId: payment.id,
+                amount: unpaidAmount,
+                direction: "incoming",
+                loanId: payment.loanId,
+              })
+            : null;
+        }
+        await payment.save({ transaction: dbTransaction });
       }
-      await payment.save();
-    }
-    if (payment.amount > payment.amountPaid) {
-      isPaid = false;
-    }
-    return payment;
-  });
+      if (payment.amount > payment.amountPaid) {
+        isPaid = false;
+      }
+      return payment;
+    });
 
-  await Promise.all(updatedPayments);
-  await createTransactions(transactions);
+    await Promise.all(updatedPayments);
+    await createTransactions(transactions, dbTransaction);
 
-  return isPaid;
+    await dbTransaction.commit();
+
+    return isPaid;
+  } catch (error) {
+    await dbTransaction.rollback();
+    throw error;
+  }
 };
 
 export const revertPayment = async (paymentId: number) => {
@@ -106,20 +116,29 @@ export const revertPayment = async (paymentId: number) => {
   }
 
   const revertAmount = payment.amountPaid;
-  await createTransactions([
-    {
-      paymentId: payment.id,
-      amount: revertAmount,
-      direction: "outgoing",
-      loanId: payment.loanId,
-    },
-  ]);
 
   payment.amountPaid = 0;
-  await payment.save();
-
   loan.isPaid = false;
-  await loan.save();
+
+  const dbTransaction = await sequelize.transaction();
+  try {
+    await createTransactions(
+      [
+        {
+          paymentId: payment.id,
+          amount: revertAmount,
+          direction: "outgoing",
+          loanId: payment.loanId,
+        },
+      ],
+      dbTransaction
+    );
+    await payment.save({ transaction: dbTransaction });
+    await loan.save({ transaction: dbTransaction });
+  } catch (error) {
+    await dbTransaction.rollback();
+    throw error;
+  }
 
   return payment;
 };
